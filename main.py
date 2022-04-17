@@ -275,36 +275,20 @@ for i in range(3):
         sns.regplot(x=x_train_reg[j], y=y_train_reg, data=houses_df, logistic=True, ci=None)
         plt.show()
 
-    if i == 0:
-        #Haciendo limpieza de multicolinealidad para caras
-        x_reg.pop('OverallQual')
-        x_reg.pop('OverallCond')
-        x_reg.pop('GrLivArea')
-        x_reg.pop('YearBuilt')
-        x_reg.pop('YearRemodAdd')
-        #x_reg.pop('TotalBsmtSF')
-        x_reg.pop('1stFlrSF')
-        x_reg.pop('FullBath')
-        x_reg.pop('Fireplaces')
-        x_reg.pop('GarageCars')
-        x_reg.pop('GarageArea')
-        #x_reg.pop('TotRmsAbvGrd')
-        x_reg.pop('SalePrice')
-    else:
-        #Haciendo limpieza de multicolinealidad para intermedias y economicas (tienen los mismos comportamientos)
-        x_reg.pop('OverallQual')
-        #x_reg.pop('OverallCond')
-        x_reg.pop('GrLivArea')
-        x_reg.pop('YearBuilt')
-        x_reg.pop('YearRemodAdd')
-        x_reg.pop('TotalBsmtSF')
-        x_reg.pop('1stFlrSF')
-        x_reg.pop('FullBath')
-        x_reg.pop('Fireplaces')
-        x_reg.pop('GarageCars')
-        #x_reg.pop('GarageArea')
-        x_reg.pop('TotRmsAbvGrd')
-        x_reg.pop('SalePrice')
+    #Haciendo limpieza de multicolinealidad para intermedias y economicas (tienen los mismos comportamientos)
+    x_reg.pop('OverallQual')
+    x_reg.pop('OverallCond')
+    x_reg.pop('GrLivArea')
+    x_reg.pop('YearBuilt')
+    x_reg.pop('YearRemodAdd')
+    #x_reg.pop('TotalBsmtSF')
+    x_reg.pop('1stFlrSF')
+    x_reg.pop('FullBath')
+    x_reg.pop('Fireplaces')
+    x_reg.pop('GarageCars')
+    x_reg.pop('GarageArea')
+    #x_reg.pop('TotRmsAbvGrd')
+    x_reg.pop('SalePrice')
 
     x_train_reg, x_test_reg, y_train_reg, y_test_reg = train_test_split(x_reg, y_reg, test_size=0.3, train_size=0.7, random_state=0)
 
@@ -334,11 +318,11 @@ for i in range(3):
 
     #Mapa de correlacion
     if i == 0:
-        corr =  houses_copy[['TotalBsmtSF','TotRmsAbvGrd', 'OverallCond', 'GarageArea', 3]].corr()
+        corr =  houses_copy[['TotalBsmtSF','TotRmsAbvGrd', 3]].corr()
     elif i == 1:
-        corr =  houses_copy[['TotalBsmtSF','TotRmsAbvGrd', 'OverallCond', 'GarageArea', 2]].corr()
+        corr =  houses_copy[['TotalBsmtSF','TotRmsAbvGrd', 2]].corr()
     else:
-        corr =  houses_copy[['TotalBsmtSF','TotRmsAbvGrd', 'OverallCond', 'GarageArea', 1]].corr()
+        corr =  houses_copy[['TotalBsmtSF','TotRmsAbvGrd', 1]].corr()
     print('Pearson correlation coefficient matrix of each variables:\n', corr)
 
     plt.figure(figsize=(16,10))
