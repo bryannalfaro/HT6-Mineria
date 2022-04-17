@@ -217,139 +217,178 @@ dummies = pd.get_dummies(houses_df['Clasificacion'])
 houses_df = pd.concat([houses_df, dummies], axis=1)
 print(dummies.head(15))
 print(houses_df.head(15))
-
-#Se hace la separacion para primera parte de solo predecir si son caras
 houses_copy = (houses_df.copy())
-economica = houses_df.pop(1)
-intermedia = houses_df.pop(2)
-caras = houses_df.pop(3)
 
-y_reg = caras # cambiar para el analisis de las otras variables
-x_reg = houses_df
-x_reg.pop('MasVnrArea')
-x_reg.pop('GarageYrBlt')
-x_reg.pop('Clasificacion')
-np.random.seed(200)
+for i in range(3):
+    #Se hace la separacion para predecir solo caras, intermedias o economicas
+    houses_df = (houses_copy.copy())
+    economica = houses_df.pop(1)
+    intermedia = houses_df.pop(2)
+    caras = houses_df.pop(3)
+    if i == 0:
+        y_reg = caras # cambiar para el analisis de las otras variables
+    elif i == 1:
+        y_reg = intermedia
+    else:
+        y_reg = economica
+    x_reg = houses_df
+    x_reg.pop('MasVnrArea')
+    x_reg.pop('GarageYrBlt')
+    x_reg.pop('Clasificacion')
+    np.random.seed(200)
 
-x_train_reg, x_test_reg, y_train_reg, y_test_reg = train_test_split(x_reg, y_reg, test_size=0.3, train_size=0.7, random_state=0)
+    x_train_reg, x_test_reg, y_train_reg, y_test_reg = train_test_split(x_reg, y_reg, test_size=0.3, train_size=0.7, random_state=0)
 
-# use all as predictor
-x= x_train_reg.values
-y= y_train_reg.values
-x_t = x_test_reg.values
-y_t = y_test_reg.values
+    # use all as predictor
+    x= x_train_reg.values
+    y= y_train_reg.values
+    x_t = x_test_reg.values
+    y_t = y_test_reg.values
 
-logistic_model= LogisticRegression(solver='liblinear')
-logistic_model.fit(x, y)
-y_pred = logistic_model.predict(x_t)
-y_probability = logistic_model.predict_proba(x)[:,1]
+    logistic_model= LogisticRegression(solver='liblinear')
+    logistic_model.fit(x, y)
+    y_pred = logistic_model.predict(x_t)
+    y_probability = logistic_model.predict_proba(x)[:,1]
 
-#print(x,type(x_reg))
+    #print(x,type(x_reg))
 
-#Analisis VIF de todas
-vif = pd.DataFrame()
-vif["VIF"] = [variance_inflation_factor(houses_df.values, i)
-                          for i in range(houses_df.shape[1])]
-vif["features"] = houses_df.columns
-print(vif.describe)
+    #Analisis VIF de todas
+    vif = pd.DataFrame()
+    vif["VIF"] = [variance_inflation_factor(houses_df.values, i)
+                            for i in range(houses_df.shape[1])]
+    vif["features"] = houses_df.columns
+    print(vif.describe)
 
-'''#Mapa de correlacion
-corr =  houses_copy.corr()
-print('Pearson correlation coefficient matrix of each variables:\n', corr)
-plt.figure(figsize=(16,10))
-#Realizando una mejor visualizacion de la matriz
-sns.heatmap(corr,annot=True,cmap='BrBG')
-plt.title('Matriz de correlaciones')
-plt.tight_layout()
-plt.show()'''
+    #Mapa de correlacion
+    corr =  houses_copy.corr()
+    print('Pearson correlation coefficient matrix of each variables:\n', corr)
+    plt.figure(figsize=(16,10))
+    #Realizando una mejor visualizacion de la matriz
+    sns.heatmap(corr,annot=True,cmap='BrBG')
+    plt.title('Matriz de correlaciones')
+    plt.tight_layout()
+    plt.show()
 
-#Mostrar todas las graficas de logistica
+    #Mostrar todas las graficas de logistica
 
-'''for i in x_train_reg.columns:
-    sns.regplot(x=x_train_reg[i], y=y_train_reg, data=houses_df, logistic=True, ci=None)
-    plt.show()'''
+    for j in x_train_reg.columns:
+        sns.regplot(x=x_train_reg[j], y=y_train_reg, data=houses_df, logistic=True, ci=None)
+        plt.show()
 
+    if i == 0:
+        #Haciendo limpieza de multicolinealidad para caras
+        x_reg.pop('OverallQual')
+        x_reg.pop('OverallCond')
+        x_reg.pop('GrLivArea')
+        x_reg.pop('YearBuilt')
+        x_reg.pop('YearRemodAdd')
+        #x_reg.pop('TotalBsmtSF')
+        x_reg.pop('1stFlrSF')
+        x_reg.pop('FullBath')
+        x_reg.pop('Fireplaces')
+        x_reg.pop('GarageCars')
+        x_reg.pop('GarageArea')
+        #x_reg.pop('TotRmsAbvGrd')
+        x_reg.pop('SalePrice')
+    elif i == 1:
+        #Haciendo limpieza de multicolinealidad para intermedias
+        x_reg.pop('OverallQual')
+        #x_reg.pop('OverallCond')
+        #x_reg.pop('GrLivArea')
+        x_reg.pop('YearBuilt')
+        x_reg.pop('YearRemodAdd')
+        #x_reg.pop('TotalBsmtSF')
+        #x_reg.pop('1stFlrSF')
+        x_reg.pop('FullBath')
+        x_reg.pop('Fireplaces')
+        x_reg.pop('GarageCars')
+        #x_reg.pop('GarageArea')
+        x_reg.pop('TotRmsAbvGrd')
+        x_reg.pop('SalePrice')
+    else:
+        #Haciendo limpieza de multicolinealidad para economicas
+        x_reg.pop('OverallQual')
+        #x_reg.pop('OverallCond')
+        #x_reg.pop('GrLivArea')
+        x_reg.pop('YearBuilt')
+        x_reg.pop('YearRemodAdd')
+        #x_reg.pop('TotalBsmtSF')
+        #x_reg.pop('1stFlrSF')
+        x_reg.pop('FullBath')
+        x_reg.pop('Fireplaces')
+        x_reg.pop('GarageCars')
+        #x_reg.pop('GarageArea')
+        x_reg.pop('TotRmsAbvGrd')
+        x_reg.pop('SalePrice')
 
-#Haciendo limpieza de multicolinealidad
-x_reg.pop('Fireplaces')
-x_reg.pop('YearBuilt')
-x_reg.pop('YearRemodAdd')
-x_reg.pop('OverallCond')
+    x_train_reg, x_test_reg, y_train_reg, y_test_reg = train_test_split(x_reg, y_reg, test_size=0.3, train_size=0.7, random_state=0)
 
+    # use all as predictor
+    x= x_train_reg.values
+    y= y_train_reg.values
+    x_t = x_test_reg.values
+    y_t = y_test_reg.values
 
-x_reg.pop('GrLivArea')
-x_reg.pop('GarageCars')
-x_reg.pop('1stFlrSF')
-x_reg.pop('OverallQual')
-#x_reg.pop('TotRmsAbvGrd')
-#x_reg.pop('TotalBsmtSF')
-x_reg.pop('FullBath')
-x_reg.pop('GarageArea')
-x_reg.pop('SalePrice')
-x_train_reg, x_test_reg, y_train_reg, y_test_reg = train_test_split(x_reg, y_reg, test_size=0.3, train_size=0.7, random_state=0)
+    tic = time.time()
+    logistic_model= LogisticRegression(solver='liblinear')
+    logistic_model.fit(x, y)
+    y_pred = logistic_model.predict(x) #entrenamiento
+    y_probability = logistic_model.predict_proba(x)[:,1]
+    toc = time.time()
 
-# use all as predictor
-x= x_train_reg.values
-y= y_train_reg.values
-x_t = x_test_reg.values
-y_t = y_test_reg.values
+    print(f'Time to process model {i}:', toc - tic)
 
-logistic_model= LogisticRegression(solver='liblinear')
-logistic_model.fit(x, y)
-y_pred = logistic_model.predict(x) #entrenamiento
-y_probability = logistic_model.predict_proba(x)[:,1]
+    #print(x,type(x_reg))
 
-#print(x,type(x_reg))
+    #Analisis VIF de todas
+    vif = pd.DataFrame()
+    vif["VIF"] = [variance_inflation_factor(houses_df.values, i)
+                            for i in range(houses_df.shape[1])]
+    vif["features"] = houses_df.columns
+    print(vif.describe)
 
-#Analisis VIF de todas
-vif = pd.DataFrame()
-vif["VIF"] = [variance_inflation_factor(houses_df.values, i)
-                          for i in range(houses_df.shape[1])]
-vif["features"] = houses_df.columns
-print(vif.describe)
+    #Mapa de correlacion
+    corr =  houses_copy[['TotalBsmtSF','TotRmsAbvGrd',3]].corr()
+    print('Pearson correlation coefficient matrix of each variables:\n', corr)
 
-'''#Mapa de correlacion
-corr =  houses_copy[['TotalBsmtSF','TotRmsAbvGrd',3]].corr()
-print('Pearson correlation coefficient matrix of each variables:\n', corr)
+    plt.figure(figsize=(16,10))
+    #Realizando una mejor visualizacion de la matriz
+    sns.heatmap(corr,annot=True,cmap='BrBG')
+    plt.title('Matriz de correlaciones')
+    plt.tight_layout()
+    plt.show()
 
-plt.figure(figsize=(16,10))
-#Realizando una mejor visualizacion de la matriz
-sns.heatmap(corr,annot=True,cmap='BrBG')
-plt.title('Matriz de correlaciones')
-plt.tight_layout()
-plt.show()'''
+    #ENTRENAMIENTO
+    accuracy=accuracy_score(y,y_pred)
+    precision =precision_score(y, y_pred,average='weighted')
+    recall =  recall_score(y, y_pred,average='weighted')
+    f1 = f1_score(y,y_pred,average='weighted')
+    print('Accuracy: ',accuracy)
+    print('Recall: ',recall)
+    print('Precision: ',precision)
 
-#ENTRENAMIENTO
-accuracy=accuracy_score(y,y_pred)
-precision =precision_score(y, y_pred,average='weighted')
-recall =  recall_score(y, y_pred,average='weighted')
-f1 = f1_score(y,y_pred,average='weighted')
-print('Accuracy: ',accuracy)
-print('Recall: ',recall)
-print('Precision: ',precision)
+    cm = confusion_matrix(y,y_pred)
+    sn.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=['Caras'], yticklabels=['Caras'])
+    plt.title('Matriz de Confusion')
+    plt.ylabel('Clasificación real')
+    plt.xlabel('Clasificación predicha')
+    plt.show()
+    print('Matriz de confusion con valores de entrenamiento \n',cm)
 
-cm = confusion_matrix(y,y_pred)
-sn.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=['Caras'], yticklabels=['Caras'])
-plt.title('Matriz de Confusion')
-plt.ylabel('Clasificación real')
-plt.xlabel('Clasificación predicha')
-plt.show()
-print('Matriz de confusion con valores de entrenamiento \n',cm)
+    #TEST
+    y_pred = logistic_model.predict(x_t) #test
+    accuracy=accuracy_score(y_t,y_pred)
+    precision =precision_score(y_t, y_pred,average='weighted')
+    recall =  recall_score(y_t, y_pred,average='weighted')
+    f1 = f1_score(y_t,y_pred,average='weighted')
+    print('Accuracy: ',accuracy)
+    print('Recall: ',recall)
+    print('Precision: ',precision)
 
-#TEST
-y_pred = logistic_model.predict(x_t) #test
-accuracy=accuracy_score(y_t,y_pred)
-precision =precision_score(y_t, y_pred,average='weighted')
-recall =  recall_score(y_t, y_pred,average='weighted')
-f1 = f1_score(y_t,y_pred,average='weighted')
-print('Accuracy: ',accuracy)
-print('Recall: ',recall)
-print('Precision: ',precision)
-
-cm = confusion_matrix(y_t,y_pred)
-sn.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=['Caras'], yticklabels=['Caras'])
-plt.title('Matriz de Confusion')
-plt.ylabel('Clasificación real')
-plt.xlabel('Clasificación predicha')
-plt.show()
-print('Matriz de confusion con valores de entrenamiento \n',cm)
+    cm = confusion_matrix(y_t,y_pred)
+    sn.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=['Caras'], yticklabels=['Caras'])
+    plt.title('Matriz de Confusion')
+    plt.ylabel('Clasificación real')
+    plt.xlabel('Clasificación predicha')
+    plt.show()
+    print('Matriz de confusion con valores de entrenamiento \n',cm)
