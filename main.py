@@ -290,30 +290,15 @@ for i in range(3):
         x_reg.pop('GarageArea')
         #x_reg.pop('TotRmsAbvGrd')
         x_reg.pop('SalePrice')
-    elif i == 1:
-        #Haciendo limpieza de multicolinealidad para intermedias
-        x_reg.pop('OverallQual')
-        #x_reg.pop('OverallCond')
-        #x_reg.pop('GrLivArea')
-        x_reg.pop('YearBuilt')
-        x_reg.pop('YearRemodAdd')
-        #x_reg.pop('TotalBsmtSF')
-        #x_reg.pop('1stFlrSF')
-        x_reg.pop('FullBath')
-        x_reg.pop('Fireplaces')
-        x_reg.pop('GarageCars')
-        #x_reg.pop('GarageArea')
-        x_reg.pop('TotRmsAbvGrd')
-        x_reg.pop('SalePrice')
     else:
-        #Haciendo limpieza de multicolinealidad para economicas
+        #Haciendo limpieza de multicolinealidad para intermedias y economicas (tienen los mismos comportamientos)
         x_reg.pop('OverallQual')
         #x_reg.pop('OverallCond')
-        #x_reg.pop('GrLivArea')
+        x_reg.pop('GrLivArea')
         x_reg.pop('YearBuilt')
         x_reg.pop('YearRemodAdd')
-        #x_reg.pop('TotalBsmtSF')
-        #x_reg.pop('1stFlrSF')
+        x_reg.pop('TotalBsmtSF')
+        x_reg.pop('1stFlrSF')
         x_reg.pop('FullBath')
         x_reg.pop('Fireplaces')
         x_reg.pop('GarageCars')
@@ -348,7 +333,12 @@ for i in range(3):
     print(vif.describe)
 
     #Mapa de correlacion
-    corr =  houses_copy[['TotalBsmtSF','TotRmsAbvGrd',3]].corr()
+    if i == 0:
+        corr =  houses_copy[['TotalBsmtSF','TotRmsAbvGrd', 'OverallCond', 'GarageArea', 3]].corr()
+    elif i == 1:
+        corr =  houses_copy[['TotalBsmtSF','TotRmsAbvGrd', 'OverallCond', 'GarageArea', 2]].corr()
+    else:
+        corr =  houses_copy[['TotalBsmtSF','TotRmsAbvGrd', 'OverallCond', 'GarageArea', 1]].corr()
     print('Pearson correlation coefficient matrix of each variables:\n', corr)
 
     plt.figure(figsize=(16,10))
