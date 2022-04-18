@@ -7,7 +7,6 @@
 #Julio Herrera
 
 '''
-
 Referencias
 Material brindado en clase
 
@@ -31,6 +30,7 @@ from copy import copy
 import matplotlib.cm as cm
 from sklearn.model_selection import train_test_split
 from scipy.stats import normaltest
+from yellowbrick.regressor import ResidualsPlot
 from statsmodels.graphics.gofplots import qqplot
 import statsmodels.api as sm
 import warnings
@@ -45,6 +45,7 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 warnings.simplefilter(action='ignore', category=DeprecationWarning)
 warnings.simplefilter(action="ignore", category=SettingWithCopyWarning)
 houses = pd.read_csv('train.csv', encoding='latin1', engine='python')
+
 
 #Conocimiento de datos
 print(houses.head())
@@ -114,9 +115,11 @@ houses_df.fillna(0)
 
 #normalizar
 df_norm  = (houses_df-houses_df.min())/(houses_df.max()-houses_df.min())
+#print(movies_clean_norm.fillna(0))
 houses_df_final = df_norm.fillna(0)
 
 #Analisis de tendencia a agrupamiento
+
 #Metodo Hopkings
 
 random.seed(200)
@@ -186,7 +189,6 @@ houses_df['Clasificacion'] = houses_df.apply(lambda row: 'Caras' if ((row['Clasi
                                                     else row['Clasificacion'], axis=1)
 # Convertir Clasaficacion a categorica
 houses_df['Clasificacion'] = houses_df.apply(lambda row: 1 if row['Clasificacion'] == 'Economicas' else 2 if row['Clasificacion'] == 'Intermedias' else 3, axis=1)
-
 
 # Ver distribucion del precio, condicion general y clasificacion
 houses_df['SalePrice'].hist()
@@ -326,7 +328,13 @@ for i in range(3):
     print('Precision: ',precision)
 
     cm = confusion_matrix(y,y_pred)
-    sn.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=['Caras'], yticklabels=['Caras'])
+    if i == 0:
+        sn.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=['Caras'], yticklabels=['Caras'])
+    elif i == 1:
+        sn.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=['Intermedias'], yticklabels=['Intermedias'])
+    else:
+        sn.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=['Economicas'], yticklabels=['Economicas'])
+
     plt.title('Matriz de Confusion')
     plt.ylabel('Clasificación real')
     plt.xlabel('Clasificación predicha')
@@ -344,9 +352,14 @@ for i in range(3):
     print('Precision: ',precision)
 
     cm = confusion_matrix(y_t,y_pred)
-    sn.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=['Caras'], yticklabels=['Caras'])
+    if i == 0:
+        sn.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=['Caras'], yticklabels=['Caras'])
+    elif i == 1:
+        sn.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=['Intermedias'], yticklabels=['Intermedias'])
+    else:
+        sn.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=['Economicas'], yticklabels=['Economicas'])    
     plt.title('Matriz de Confusion')
     plt.ylabel('Clasificación real')
     plt.xlabel('Clasificación predicha')
     plt.show()
-    print('Matriz de confusion con valores de entrenamiento \n',cm)
+    print('Matriz de confusion con valores de prueba \n',cm)
