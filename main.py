@@ -7,6 +7,7 @@
 #Julio Herrera
 
 '''
+
 Referencias
 Material brindado en clase
 
@@ -24,14 +25,12 @@ from sklearn.model_selection import StratifiedShuffleSplit, train_test_split
 import pyclustertend
 import random
 from sklearn.cluster import KMeans
-import graphviz
 import sklearn.mixture as mixture
 import scipy.cluster.hierarchy as sch
 from copy import copy
 import matplotlib.cm as cm
 from sklearn.model_selection import train_test_split
 from scipy.stats import normaltest
-from yellowbrick.regressor import ResidualsPlot
 from statsmodels.graphics.gofplots import qqplot
 import statsmodels.api as sm
 import warnings
@@ -47,8 +46,6 @@ warnings.simplefilter(action='ignore', category=DeprecationWarning)
 warnings.simplefilter(action="ignore", category=SettingWithCopyWarning)
 houses = pd.read_csv('train.csv', encoding='latin1', engine='python')
 
-'''
-
 #Conocimiento de datos
 print(houses.head())
 
@@ -58,10 +55,9 @@ print(houses.shape)
 #Medidas estadisticas.
 print(houses.describe().transpose())
 
-print(houses.select_dtypes(exclude=['object']).info())'''
+print(houses.select_dtypes(exclude=['object']).info())
 
-
-'''#Casas que ofrecen todas las utilidades
+#Casas que ofrecen todas las utilidades
 print(houses['Utilities'].value_counts())
 
 plt.bar(houses['Utilities'].value_counts().sort_index().dropna().index, houses['Utilities'].value_counts().sort_index().values, color='red')
@@ -91,11 +87,11 @@ print(houses.sort_values(by='SalePrice', ascending=False)[['GarageCars','SalePri
 print(houses.sort_values(by='SalePrice', ascending=True)[['GarageCars','SalePrice']].head(5))
 
 #Condicion de garage y calidad de la cocina de las 5 casas mas caras
-print(houses.sort_values(by='SalePrice', ascending=False)[['GarageCond','KitchenQual','SalePrice']].head(5))'''
+print(houses.sort_values(by='SalePrice', ascending=False)[['GarageCond','KitchenQual','SalePrice']].head(5))
 
 houses_clean = houses.select_dtypes(exclude='object').drop('Id', axis=1)
 
-'''#preprocesamiento
+#preprocesamiento
 corr_data = houses_clean.iloc[:,:]
 mat_correlation=corr_data.corr() # se calcula la matriz , usando el coeficiente de correlacion de Pearson
 plt.figure(figsize=(16,10))
@@ -104,25 +100,23 @@ plt.figure(figsize=(16,10))
 sns.heatmap(mat_correlation,annot=True,cmap='BrBG')
 plt.title('Matriz de correlaciones  para la base Houses')
 plt.tight_layout()
-plt.show()'''
+plt.show()
 
 # Seleccion de variables
 houses_df = houses_clean[['OverallQual', 'OverallCond', 'GrLivArea', 'YearBuilt', 'YearRemodAdd', 'MasVnrArea', 'TotalBsmtSF', '1stFlrSF', 'FullBath', 'Fireplaces',
 'GarageCars', 'GarageArea', 'GarageYrBlt','TotRmsAbvGrd','SalePrice']]
-'''
+
 print(houses_df.head().dropna())
 print(houses_df.info())
 print(houses_df.describe().transpose())
-'''
+
 houses_df.fillna(0)
 
 #normalizar
 df_norm  = (houses_df-houses_df.min())/(houses_df.max()-houses_df.min())
-#print(movies_clean_norm.fillna(0))
 houses_df_final = df_norm.fillna(0)
 
-'''#Analisis de tendencia a agrupamiento
-
+#Analisis de tendencia a agrupamiento
 #Metodo Hopkings
 
 random.seed(200)
@@ -175,10 +169,7 @@ houses_df['Cluster'] = houses_df_final['cluster']
 print((houses_df[houses_df['Cluster']==0]).describe().transpose())
 print((houses_df[houses_df['Cluster']==1]).describe().transpose())
 print((houses_df[houses_df['Cluster']==2]).describe().transpose())
-houses_df.pop('Cluster)
-'''
-
-
+houses_df.pop('Cluster')
 
 
 # Creacion de la respuesta (clasificacion de casas en: Economicas, Intermedias o Caras)
@@ -196,7 +187,7 @@ houses_df['Clasificacion'] = houses_df.apply(lambda row: 'Caras' if ((row['Clasi
 # Convertir Clasaficacion a categorica
 houses_df['Clasificacion'] = houses_df.apply(lambda row: 1 if row['Clasificacion'] == 'Economicas' else 2 if row['Clasificacion'] == 'Intermedias' else 3, axis=1)
 
-'''
+
 # Ver distribucion del precio, condicion general y clasificacion
 houses_df['SalePrice'].hist()
 plt.title('Histograma de precios')
@@ -207,7 +198,6 @@ plt.show()
 houses_df['Clasificacion'].hist()
 plt.title('Histograma de clasificacion')
 plt.show()
-'''
 
 
 # Division de datos, 70% de entrenamiento y 30% de prueba, manteniendo distribucion de clasificacion
@@ -250,8 +240,6 @@ for i in range(3):
     y_pred = logistic_model.predict(x_t)
     y_probability = logistic_model.predict_proba(x)[:,1]
 
-    #print(x,type(x_reg))
-
     #Analisis VIF de todas
     vif = pd.DataFrame()
     vif["VIF"] = [variance_inflation_factor(houses_df.values, i)
@@ -281,13 +269,11 @@ for i in range(3):
     x_reg.pop('GrLivArea')
     x_reg.pop('YearBuilt')
     x_reg.pop('YearRemodAdd')
-    #x_reg.pop('TotalBsmtSF')
     x_reg.pop('1stFlrSF')
     x_reg.pop('FullBath')
     x_reg.pop('Fireplaces')
     x_reg.pop('GarageCars')
     x_reg.pop('GarageArea')
-    #x_reg.pop('TotRmsAbvGrd')
     x_reg.pop('SalePrice')
 
     x_train_reg, x_test_reg, y_train_reg, y_test_reg = train_test_split(x_reg, y_reg, test_size=0.3, train_size=0.7, random_state=0)
@@ -306,8 +292,6 @@ for i in range(3):
     toc = time.time()
 
     print(f'Time to process model {i}:', toc - tic)
-
-    #print(x,type(x_reg))
 
     #Analisis VIF de todas
     vif = pd.DataFrame()
